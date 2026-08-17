@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Chapters and Charms Games</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=DM+Sans:wght@400;500;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="paper">
+    <img class="sprig left" src="assets/left_botanical_sprig.png" alt=""><img class="sprig right" src="assets/right_botanical_sprig.png" alt="">
+    <header><p class="eyebrow">A literary evening of numbers & charm</p><img class="crate" src="assets/wooden_crate_books.png" alt="Vintage books in a wooden crate"><h1>Chapters <i>&amp;</i> Charms</h1><p class="subtitle">Games</p><img class="divider" src="assets/decorative_heart_divider.png" alt=""></header>
+    <section id="welcome" class="welcome">
+      <p class="eyebrow" id="welcomeKicker">Host’s reading room</p><h2 id="welcomeTitle">Begin a new game.</h2><p id="welcomeText">Create a room, draw the numbers, and invite your friends to play from their own phones.</p>
+      <label for="name">Your name</label><input id="name" maxlength="22" placeholder="e.g. Lipika"><button id="enter" class="primary">Create host room <span>→</span></button><small id="welcomeNote">Only this screen will have the number-draw button.</small>
+    </section>
+    <section id="game" class="game hidden">
+      <div class="topbar"><div><p class="eyebrow" id="roleLabel">Host control room</p><strong id="roomLabel">Room</strong></div><button id="invite" class="outline">↗ Invite guests</button></div>
+      <div class="number-card"><p>The number being read</p><div id="current" class="number">—</div><em id="numberMessage">The story is about to begin.</em><button id="draw" class="primary">Draw a number <span>✦</span></button></div>
+      <section class="ticket-section"><div class="ticket-title"><div><p class="eyebrow">Your bookmark</p><h2 id="ticketTitle">Your ticket</h2></div><small id="markCount">0 / 15 marked</small></div><div id="ticket" class="ticket"></div><p class="tip">Tap a called number to mark it with a rose seal.</p></section>
+      <section class="claims"><p class="eyebrow">Call your prize</p><div id="claimButtons" class="claim-grid"><button data-award="Early Five">Early Five<small>5 marks</small></button><button data-award="Top Line">Top Line<small>row complete</small></button><button data-award="Middle Line">Middle Line<small>row complete</small></button><button data-award="Bottom Line">Bottom Line<small>row complete</small></button><button class="full" data-award="Full House">♥ Full House<small>15 marks</small></button></div></section>
+      <details><summary>Numbers already read <b id="historyCount">0</b></summary><div id="history" class="history"></div></details>
+    </section>
+    <footer><img src="assets/open_book_with_flower.png" alt="">“A reader lives a thousand lives…”</footer>
+  </main>
+  <div id="toast"></div><div id="winner" class="modal hidden"><article><p class="sparkle">✦ &nbsp; ♥ &nbsp; ✦</p><p class="eyebrow">A winning chapter</p><h2 id="winnerAward">Early Five!</h2><p id="winnerName"></p><button id="closeWinner" class="primary">Continue the game</button></article></div>
+  <script type="module" src="app.js"></script>
+</body></html>
