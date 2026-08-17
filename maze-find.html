@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chapter & Charm: Maze Search</title>
+    <title>Chapter & Charm: The Interactive Maze</title>
     <style>
-        :root { --wood: #4a3728; --gold: #c5a059; --paper: #fdfaf3; --accent: #8b5e3c; }
+        :root { --wood: #4a3728; --gold: #c5a059; --paper: #fdfaf3; --accent: #8b5e3c; --ink: #1a2a3a; }
         
         body { 
             font-family: 'Georgia', serif; 
@@ -13,10 +13,11 @@
             color: var(--wood); 
             margin: 0; 
             text-align: center; 
-            overflow-x: hidden; 
+            overflow-x: hidden;
+            overscroll-behavior: none; /* Stops phone screen from bouncing while drawing */
         }
 
-        /* --- START SCREEN --- */
+        /* --- BEAUTIFUL START SCREEN --- */
         #start-screen { 
             height: 100vh; 
             width: 100%;
@@ -26,18 +27,14 @@
             align-items: center; 
             background: linear-gradient(rgba(44, 30, 20, 0.75), rgba(44, 30, 20, 0.75)), url('maze_bg.jpg');
             background-size: cover;
-            background-position: center;
             position: relative;
         }
 
-        /* Decorations */
-        .deco-botanical-l { position: absolute; top: -10px; left: -10px; width: 220px; pointer-events: none; z-index: 5; }
-        .deco-botanical-r { position: absolute; top: -10px; right: -10px; width: 220px; pointer-events: none; z-index: 5; }
-        .deco-crate { position: absolute; bottom: 10px; left: 10px; width: 180px; pointer-events: none; }
-        .deco-book { position: absolute; bottom: 10px; right: 10px; width: 180px; pointer-events: none; }
-        .deco-sparkle { position: absolute; top: 10%; right: 10%; width: 80px; pointer-events: none; animation: blink 3s infinite; }
-
-        @keyframes blink { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        .deco { position: absolute; pointer-events: none; z-index: 5; }
+        .deco-botanical-l { top: -10px; left: -10px; width: 220px; }
+        .deco-botanical-r { top: -10px; right: -10px; width: 220px; }
+        .deco-crate { bottom: 10px; left: 10px; width: 180px; }
+        .deco-book { bottom: 10px; right: 10px; width: 180px; }
 
         .parchment-box { 
             background: var(--paper); 
@@ -48,12 +45,10 @@
             width: 85%; 
             max-width: 400px; 
             z-index: 20;
-            position: relative;
         }
 
         .heart-divider { width: 200px; margin: 15px auto; display: block; }
         h1 { font-size: 1.8rem; margin: 0; color: var(--accent); text-transform: uppercase; }
-        p { font-style: italic; font-size: 0.9rem; margin: 10px 0 20px 0; }
 
         input { 
             padding: 12px; 
@@ -63,7 +58,6 @@
             width: 80%; 
             margin-bottom: 15px; 
             text-align: center;
-            outline: none;
             background: white;
         }
 
@@ -77,113 +71,133 @@
             cursor: pointer; 
             font-weight: bold; 
             box-shadow: 0 4px 0 #5d3f29;
-            transition: 0.2s;
         }
-        .btn-start:active { transform: translateY(2px); box-shadow: 0 2px 0 #5d3f29; }
 
         /* --- GAME UI --- */
         #game-ui { display: none; background: #1a110a; color: var(--paper); padding: 12px; position: sticky; top: 0; z-index: 100; justify-content: space-around; border-bottom: 2px solid var(--gold); }
         .stat b { display: block; color: var(--gold); font-size: 1.2rem; }
 
-        /* --- GAME BOARD --- */
-        #game-area { display: none; position: relative; width: 100%; max-width: 600px; margin: 10px auto; }
+        /* --- INTERACTIVE MAZE AREA --- */
+        #game-area { 
+            display: none; 
+            position: relative; 
+            width: 100%; 
+            max-width: 600px; 
+            margin: 10px auto; 
+            touch-action: none; /* Prevents scrolling while drawing */
+        }
+        
         #bg-img { width: 100%; display: block; border: 3px solid var(--gold); pointer-events: none; }
-        .hitbox { position: absolute; background: rgba(255,255,255,0); border-radius: 50%; z-index: 10; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        
+        #maze-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            cursor: crosshair;
+        }
+
+        /* Hitboxes - Placed ABOVE the canvas so they can be clicked */
+        .hitbox { position: absolute; background: rgba(255,255,255,0); border-radius: 50%; z-index: 20; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
         #checklist { display: none; background: var(--paper); color: #333; width: 90%; max-width: 600px; margin: 15px auto; padding: 15px; border-radius: 5px; column-count: 2; text-align: left; list-style: none; border: 1px solid var(--gold); }
         .item { font-size: 0.8rem; margin-bottom: 5px; border-bottom: 1px dotted #ddd; }
-        .done { text-decoration: line-through; color: #bbb; font-weight: normal; }
+        .done { text-decoration: line-through; color: #bbb; }
 
         #popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 200; flex-direction: column; justify-content: center; align-items: center; padding: 20px; color: #fff; }
+        
+        .controls { margin-top: 10px; display: none; }
+        .btn-clear { background: #666; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
-    <!-- SCREEN 1: START SCREEN -->
+    <!-- START SCREEN -->
     <div id="start-screen">
-        <img src="botanical_left.png" class="deco-botanical-l">
-        <img src="botanical_right.png" class="deco-botanical-r">
-        <img src="sparkles.png" class="deco-sparkle">
-        <img src="wooden_crate.png" class="deco-crate">
-        <img src="book_flower.png" class="deco-book">
+        <img src="botanical_left.png" class="deco deco-botanical-l">
+        <img src="botanical_right.png" class="deco deco-botanical-r">
+        <img src="wooden_crate.png" class="deco deco-crate">
+        <img src="book_flower.png" class="deco deco-book">
 
         <div class="parchment-box">
-            <h1>Maze Charms</h1>
+            <h1>Maze & Charms</h1>
             <img src="divider.png" class="heart-divider">
-            <p>Help the book lover find 10 charms!</p>
-            
+            <p>Enter your name, draw your path, and find all 10 charms!</p>
             <input type="text" id="guestName" placeholder="Enter Guest Name...">
             <br>
-            <button class="btn-start" onclick="beginGame()">BEGIN SEARCH</button>
+            <button class="btn-start" onclick="beginGame()">BEGIN JOURNEY</button>
         </div>
     </div>
 
-    <!-- SCREEN 2: GAMEPLAY -->
+    <!-- GAME TOP HEADER -->
     <div id="game-ui">
         <div class="stat">GUEST<br><b id="name-tag">---</b></div>
         <div class="stat">TIMER<br><b id="timer">60</b>s</div>
         <div class="stat">FOUND<br><b id="counter">0/10</b></div>
     </div>
 
+    <!-- INTERACTIVE AREA -->
     <div id="game-area">
         <img src="maze_bg.jpg" id="bg-img">
+        <canvas id="maze-canvas"></canvas>
         
-        <!-- Interactive Zones mapped to image elements -->
-        <div class="hitbox" onclick="tap(0, this)" style="left: 6%; top: 34%; width: 12%; height: 10%;"></div> <!-- Bow -->
-        <div class="hitbox" onclick="tap(1, this)" style="left: 88%; top: 3%; width: 9%; height: 13%;"></div> <!-- Quill -->
-        <div class="hitbox" onclick="tap(2, this)" style="left: 45%; top: 86%; width: 10%; height: 8%;"></div> <!-- Heart Divider -->
-        <div class="hitbox" onclick="tap(3, this)" style="left: 85%; top: 15%; width: 8%; height: 8%;"></div> <!-- Ink Pot -->
-        <div class="hitbox" onclick="tap(4, this)" style="left: 31%; top: 90%; width: 14%; height: 8%;"></div> <!-- Glasses -->
-        <div class="hitbox" onclick="tap(5, this)" style="left: 49%; top: 89%; width: 15%; height: 10%;"></div> <!-- Bookmark -->
-        <div class="hitbox" onclick="tap(6, this)" style="left: 10%; top: 88%; width: 14%; height: 10%;"></div> <!-- Pink Rose -->
-        <div class="hitbox" onclick="tap(7, this)" style="left: 85%; top: 51%; width: 8%; height: 8%;"></div> <!-- Note Heart -->
-        <div class="hitbox" onclick="tap(8, this)" style="left: 88%; top: 58%; width: 8%; height: 8%;"></div> <!-- Gold Star -->
-        <div class="hitbox" onclick="tap(9, this)" style="left: 77%; top: 90%; width: 14%; height: 9%;"></div> <!-- Cup Handle -->
+        <!-- Object Hitboxes (Placing these according to the Maze layout) -->
+        <div class="hitbox" onclick="tap(0, this)" style="left: 6%; top: 34%; width: 12%; height: 10%;"></div>
+        <div class="hitbox" onclick="tap(1, this)" style="left: 88%; top: 3%; width: 9%; height: 13%;"></div>
+        <div class="hitbox" onclick="tap(2, this)" style="left: 45%; top: 86%; width: 10%; height: 8%;"></div>
+        <div class="hitbox" onclick="tap(3, this)" style="left: 85%; top: 15%; width: 8%; height: 8%;"></div>
+        <div class="hitbox" onclick="tap(4, this)" style="left: 31%; top: 90%; width: 14%; height: 8%;"></div>
+        <div class="hitbox" onclick="tap(5, this)" style="left: 49%; top: 89%; width: 15%; height: 10%;"></div>
+        <div class="hitbox" onclick="tap(6, this)" style="left: 10%; top: 88%; width: 14%; height: 10%;"></div>
+        <div class="hitbox" onclick="tap(7, this)" style="left: 85%; top: 51%; width: 8%; height: 8%;"></div>
+        <div class="hitbox" onclick="tap(8, this)" style="left: 88%; top: 58%; width: 8%; height: 8%;"></div>
+        <div class="hitbox" onclick="tap(9, this)" style="left: 77%; top: 90%; width: 14%; height: 9%;"></div>
+    </div>
+
+    <div class="controls" id="draw-controls">
+        <button class="btn-clear" onclick="clearInk()">Reset Path</button>
     </div>
 
     <ul id="checklist">
-        <li class="item" id="L0">⚪ Pink Hair Bow</li>
+        <li class="item" id="L0">⚪ Hair Bow</li>
         <li class="item" id="L1">⚪ Blue Quill</li>
         <li class="item" id="L2">⚪ Heart Scroll</li>
         <li class="item" id="L3">⚪ Ink Pot</li>
         <li class="item" id="L4">⚪ Round Glasses</li>
-        <li class="item" id="L5">⚪ Floral Bookmark</li>
+        <li class="item" id="L5">⚪ Bookmark</li>
         <li class="item" id="L6">⚪ Rose on Book</li>
-        <li class="item" id="L7">⚪ Small Note Heart</li>
-        <li class="item" id="L8">⚪ Golden Star</li>
+        <li class="item" id="L7">⚪ Note Heart</li>
+        <li class="item" id="L8">⚪ Gold Star</li>
         <li class="item" id="L9">⚪ Tea Cup</li>
     </ul>
 
-    <!-- SCREEN 3: POPUP -->
     <div id="popup">
         <h1 id="pop-h" style="color:var(--gold)"></h1>
         <p id="pop-p"></p>
-        <button class="btn-start" onclick="location.reload()">TRY AGAIN</button>
+        <button class="btn-start" onclick="location.reload()">PLAY AGAIN</button>
     </div>
 
     <script>
-        let found = 0;
-        let time = 60;
-        let active = false;
-        let clock;
+        let found = 0, time = 60, active = false, clock;
+        const canvas = document.getElementById('maze-canvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
 
         function beginGame() {
-            console.log("Button Clicked"); // Debug check
-            const input = document.getElementById('guestName');
-            const name = input.value.trim();
-            
-            if(!name) {
-                alert("Please enter your name first!");
-                return;
-            }
+            const nameInput = document.getElementById('guestName');
+            const name = nameInput.value.trim();
+            if(!name) return alert("Please enter your name!");
 
-            // Hide/Show Logic
             document.getElementById('name-tag').innerText = name;
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('game-ui').style.display = 'flex';
             document.getElementById('game-area').style.display = 'block';
             document.getElementById('checklist').style.display = 'block';
+            document.getElementById('draw-controls').style.display = 'block';
             
+            setupCanvas();
             active = true;
             clock = setInterval(() => {
                 time--;
@@ -192,16 +206,64 @@
             }, 1000);
         }
 
+        // --- DRAWING ENGINE ---
+        function setupCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            ctx.strokeStyle = "#1a2a3a"; // Vintage ink blue
+            ctx.lineWidth = 3;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+        }
+
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        function startDrawing(e) {
+            if(!active) return;
+            isDrawing = true;
+            const pos = getMousePos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }
+
+        function draw(e) {
+            if(!isDrawing || !active) return;
+            e.preventDefault();
+            const pos = getMousePos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        }
+
+        function stopDrawing() { isDrawing = false; }
+
+        // Event Listeners for PC and Phone
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        window.addEventListener('mouseup', stopDrawing);
+
+        canvas.addEventListener('touchstart', startDrawing);
+        canvas.addEventListener('touchmove', draw);
+        canvas.addEventListener('touchend', stopDrawing);
+
+        function clearInk() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // --- HIDDEN OBJECT ENGINE ---
         function tap(id, el) {
             const li = document.getElementById('L' + id);
             if(!active || li.classList.contains('done')) return;
-
-            // Update item
             li.classList.add('done');
             li.innerText = li.innerText.replace('⚪', '✅');
             el.style.background = "rgba(197, 160, 89, 0.4)";
-            el.style.border = "2px solid gold";
-
             found++;
             document.getElementById('counter').innerText = found + "/10";
             if(found === 10) finish(true);
@@ -211,14 +273,11 @@
             active = false;
             clearInterval(clock);
             document.getElementById('popup').style.display = 'flex';
-            if(win) {
-                document.getElementById('pop-h').innerText = "VICTORY!";
-                document.getElementById('pop-p').innerText = "Magnificent! You found all 10 charms!";
-            } else {
-                document.getElementById('pop-h').innerText = "TIME UP!";
-                document.getElementById('pop-p').innerText = "You found " + found + " charms.";
-            }
+            document.getElementById('pop-h').innerText = win ? "VICTORY!" : "TIME UP!";
+            document.getElementById('pop-p').innerText = win ? "You reached the end of the story!" : "You found " + found + " charms.";
         }
+
+        window.addEventListener('resize', setupCanvas);
     </script>
 </body>
 </html>
