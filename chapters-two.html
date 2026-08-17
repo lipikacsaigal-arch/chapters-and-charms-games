@@ -3,49 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chapters & Charms: Hidden Objects II</title>
+    <title>Chapters & Charms: Hidden Objects</title>
     <style>
-        :root { --wood: #4a3728; --gold: #c5a059; --paper: #f4ece1; }
-        body { font-family: 'Georgia', serif; background: var(--wood); color: var(--paper); margin: 0; text-align: center; overflow-x: hidden; }
+        :root { --wood: #4a3728; --gold: #c5a059; --paper: #fdfaf3; --accent: #8b5e3c; }
         
-        /* Start Screen */
-        #start-screen { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.85); }
-        .box { background: var(--paper); padding: 30px; border-radius: 15px; border: 5px solid var(--gold); color: #333; width: 85%; max-width: 400px; }
-        input { padding: 12px; font-size: 1.1rem; border: 2px solid var(--gold); border-radius: 8px; width: 90%; margin-bottom: 20px; text-align: center; }
-        .btn { background: var(--wood); color: white; border: none; padding: 15px 35px; font-size: 1.2rem; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        body { 
+            font-family: 'Georgia', serif; 
+            background: #2c1e14; 
+            color: var(--wood); 
+            margin: 0; 
+            text-align: center; 
+            overflow-x: hidden; 
+        }
 
-        /* Game UI */
-        #game-ui { display: none; background: rgba(0,0,0,0.9); padding: 10px; position: sticky; top: 0; z-index: 100; justify-content: space-around; border-bottom: 2px solid var(--gold); }
-        .stat { font-size: 0.85rem; }
-        .stat span { display: block; color: var(--gold); font-weight: bold; font-size: 1.2rem; }
+        /* --- PRETTY START SCREEN --- */
+        #start-screen { 
+            height: 100vh; 
+            width: 100%;
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            background: linear-gradient(rgba(44, 30, 20, 0.8), rgba(44, 30, 20, 0.8)), url('library_v2.jpg');
+            background-size: cover;
+            position: relative;
+            overflow: hidden;
+        }
 
-        /* Game Container */
+        /* Decorative Botanical Corners */
+        .deco-botanical-l { position: absolute; top: -20px; left: -20px; width: 250px; opacity: 0.8; pointer-events: none; }
+        .deco-botanical-r { position: absolute; top: -20px; right: -20px; width: 250px; opacity: 0.8; pointer-events: none; }
+        .deco-crate { position: absolute; bottom: 10px; left: 10px; width: 220px; pointer-events: none; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)); }
+        .deco-book { position: absolute; bottom: 10px; right: 10px; width: 200px; pointer-events: none; }
+        .deco-sparkle { position: absolute; top: 15%; right: 15%; width: 80px; animation: blink 3s infinite; }
+
+        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        .parchment-box { 
+            background: var(--paper); 
+            padding: 40px 30px; 
+            border-radius: 5px; 
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5), inset 0 0 100px rgba(197, 160, 89, 0.1);
+            width: 85%; 
+            max-width: 450px; 
+            z-index: 10;
+            position: relative;
+        }
+
+        .heart-divider { width: 80%; max-width: 300px; margin: 15px auto; display: block; }
+
+        h1 { font-size: 2.2rem; margin: 0; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; }
+        p { font-style: italic; color: var(--wood); margin-bottom: 25px; }
+
+        input { 
+            padding: 15px; 
+            font-size: 1.1rem; 
+            border: 1px solid var(--gold); 
+            background: #fff;
+            border-radius: 4px; 
+            width: 80%; 
+            margin-bottom: 20px; 
+            text-align: center;
+            font-family: 'Georgia', serif;
+        }
+
+        .btn-start { 
+            background: var(--accent); 
+            color: #fff; 
+            border: none; 
+            padding: 15px 40px; 
+            font-size: 1.1rem; 
+            border-radius: 3px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            letter-spacing: 1px;
+            transition: 0.3s;
+            box-shadow: 0 4px 0 #5d3f29;
+        }
+        .btn-start:active { transform: translateY(3px); box-shadow: 0 1px 0 #5d3f29; }
+
+        /* --- GAME UI --- */
+        #game-ui { display: none; background: #2c1e14; color: var(--paper); padding: 10px; position: sticky; top: 0; z-index: 100; justify-content: space-around; border-bottom: 2px solid var(--gold); }
+        .stat span { display: block; color: var(--gold); font-weight: bold; font-size: 1.3rem; }
+
         #game-area { display: none; position: relative; width: 100%; max-width: 600px; margin: 10px auto; }
         #bg-img { width: 100%; display: block; border: 3px solid var(--gold); pointer-events: none; }
-        
-        /* Hitboxes - Invisible Zones */
         .hitbox { position: absolute; background: rgba(255,255,255,0); border-radius: 50%; z-index: 5; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
-        /* Checklist */
-        #checklist { display: none; background: var(--paper); color: #333; width: 90%; max-width: 600px; margin: 15px auto; padding: 15px; border-radius: 10px; column-count: 2; text-align: left; list-style: none; }
-        .item { font-size: 0.8rem; margin-bottom: 6px; font-weight: bold; }
+        #checklist { display: none; background: var(--paper); color: #333; width: 90%; max-width: 600px; margin: 15px auto; padding: 20px; border-radius: 5px; column-count: 2; text-align: left; list-style: none; border: 1px solid var(--gold); }
+        .item { font-size: 0.85rem; margin-bottom: 8px; border-bottom: 1px dotted #ccc; padding-bottom: 2px; }
         .done { text-decoration: line-through; color: #aaa; opacity: 0.5; }
 
-        /* Result Popup */
-        #popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 200; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+        #popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; flex-direction: column; justify-content: center; align-items: center; padding: 20px; color: #fff; }
     </style>
 </head>
 <body>
 
-    <!-- SCREEN 1: NAME ENTRY -->
+    <!-- SCREEN 1: THE PRETTY START PAGE -->
     <div id="start-screen">
-        <div class="box">
-            <h1 style="margin:0 0 10px 0; color:var(--wood)">Chapters & Charms</h1>
-            <p><strong>Seek & Find Challenge</strong></p>
+        <!-- Botanical Decorations -->
+        <img src="botanical_left.png" class="deco-botanical-l">
+        <img src="botanical_right.png" class="deco-botanical-r">
+        <img src="sparkles.png" class="deco-sparkle">
+        <img src="wooden_crate.png" class="deco-crate">
+        <img src="book_flower.png" class="deco-book">
+
+        <div class="parchment-box">
+            <h1>Chapters & Charms</h1>
+            <img src="divider.png" class="heart-divider">
+            <p>Welcome to the Hidden Library</p>
+            
             <input type="text" id="guestName" placeholder="Enter Guest Name..." autocomplete="off">
             <br>
-            <button class="btn" onclick="begin()">START GAME</button>
-            <p style="font-size:0.8rem; margin-top:15px; color:#555">You have 60 seconds to find 10 items.</p>
+            <button class="btn-start" onclick="begin()">ENTER LIBRARY</button>
+            <p style="font-size:0.8rem; margin-top:20px; font-style: normal; opacity: 0.7;">Find 10 hidden charms in 60 seconds.</p>
         </div>
     </div>
 
@@ -59,17 +131,17 @@
     <div id="game-area">
         <img src="library_v2.jpg" id="bg-img">
         
-        <!-- ITEM HITBOXES (Mapped from your Answer Key circles) -->
-        <div class="hitbox" onclick="tap(0, this)" style="left: 11%; top: 22%; width: 7%; height: 6%;"></div> <!-- 1. Gold Key -->
-        <div class="hitbox" onclick="tap(1, this)" style="left: 20%; top: 18%; width: 7%; height: 6%;"></div> <!-- 2. Feather Quill -->
-        <div class="hitbox" onclick="tap(2, this)" style="left: 84%; top: 25%; width: 7%; height: 6%;"></div> <!-- 3. Miniature Teacup -->
-        <div class="hitbox" onclick="tap(3, this)" style="left: 10%; top: 87%; width: 8%; height: 7%;"></div> <!-- 4. Tiny Open Book -->
-        <div class="hitbox" onclick="tap(4, this)" style="left: 34%; top: 82%; width: 9%; height: 7%;"></div> <!-- 5. Round Spectacles -->
-        <div class="hitbox" onclick="tap(5, this)" style="left: 5%; top: 52%; width: 7%; height: 6%;"></div>  <!-- 6. Little Heart Charm -->
-        <div class="hitbox" onclick="tap(6, this)" style="left: 48%; top: 7%; width: 6%; height: 6%;"></div>  <!-- 7. Extra Gold Star -->
-        <div class="hitbox" onclick="tap(7, this)" style="left: 23%; top: 74%; width: 6%; height: 6%;"></div> <!-- 8. Second Lit Candle -->
-        <div class="hitbox" onclick="tap(8, this)" style="left: 55%; top: 56%; width: 8%; height: 7%;"></div> <!-- 9. Rose Ribbon Bow -->
-        <div class="hitbox" onclick="tap(9, this)" style="left: 90%; top: 44%; width: 7%; height: 6%;"></div> <!-- 10. Four-leaf Clover -->
+        <!-- ITEM HITBOXES -->
+        <div class="hitbox" onclick="tap(0, this)" style="left: 11%; top: 22%; width: 7%; height: 6%;"></div>
+        <div class="hitbox" onclick="tap(1, this)" style="left: 20%; top: 18%; width: 7%; height: 6%;"></div>
+        <div class="hitbox" onclick="tap(2, this)" style="left: 84%; top: 25%; width: 7%; height: 6%;"></div>
+        <div class="hitbox" onclick="tap(3, this)" style="left: 10%; top: 87%; width: 8%; height: 7%;"></div>
+        <div class="hitbox" onclick="tap(4, this)" style="left: 34%; top: 82%; width: 9%; height: 7%;"></div>
+        <div class="hitbox" onclick="tap(5, this)" style="left: 5%; top: 52%; width: 7%; height: 6%;"></div>
+        <div class="hitbox" onclick="tap(6, this)" style="left: 48%; top: 7%; width: 6%; height: 6%;"></div>
+        <div class="hitbox" onclick="tap(7, this)" style="left: 23%; top: 74%; width: 6%; height: 6%;"></div>
+        <div class="hitbox" onclick="tap(8, this)" style="left: 55%; top: 56%; width: 8%; height: 7%;"></div>
+        <div class="hitbox" onclick="tap(9, this)" style="left: 90%; top: 44%; width: 7%; height: 6%;"></div>
     </div>
 
     <ul id="checklist">
@@ -85,13 +157,10 @@
         <li class="item" id="L9">⚪ Four-leaf Clover</li>
     </ul>
 
-    <!-- SCREEN 3: RESULTS -->
     <div id="popup">
         <h1 id="pop-h" style="color:var(--gold); font-size: 2.5rem;"></h1>
         <p id="pop-p" style="font-size: 1.2rem;"></p>
-        <button class="btn" onclick="location.reload()">PLAY AGAIN</button>
-        <br><br>
-        <button class="btn" onclick="window.location.href='index.html'" style="background:#666; padding:10px 20px; font-size:0.9rem">BACK TO TAMBOLA</button>
+        <button class="btn-start" onclick="location.reload()">TRY AGAIN</button>
     </div>
 
     <script>
@@ -102,7 +171,7 @@
 
         function begin() {
             const user = document.getElementById('guestName').value;
-            if(!user) return alert("Enter your name to start!");
+            if(!user) return alert("Enter your name to enter the library!");
 
             document.getElementById('name-tag').innerText = user;
             document.getElementById('start-screen').style.display = 'none';
@@ -136,15 +205,12 @@
             active = false;
             clearInterval(clock);
             document.getElementById('popup').style.display = 'flex';
-            const h = document.getElementById('pop-h');
-            const p = document.getElementById('pop-p');
-
             if(win) {
-                h.innerText = "VICTORY!";
-                p.innerText = "Excellent! You found all objects in " + (60 - time) + " seconds!";
+                document.getElementById('pop-h').innerText = "VICTORY!";
+                document.getElementById('pop-p').innerText = "You found all items in " + (60 - time) + " seconds!";
             } else {
-                h.innerText = "TIME'S UP!";
-                p.innerText = "You found " + found + " objects. The library holds its secrets...";
+                document.getElementById('pop-h').innerText = "TIME'S UP!";
+                document.getElementById('pop-p').innerText = "You found " + found + " items.";
             }
         }
     </script>
