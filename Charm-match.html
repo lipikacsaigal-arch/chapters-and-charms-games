@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter & Charm: Match the Magic</title>
+    <style>
+        :root { --wood: #4a3728; --gold: #c5a059; --paper: #fdfaf3; --accent: #8b5e3c; }
+        
+        body { font-family: 'Georgia', serif; background: #2c1e14; color: var(--wood); margin: 0; text-align: center; }
+
+        /* START SCREEN */
+        #start-screen { 
+            height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: linear-gradient(rgba(44,30,20,0.8), rgba(44,30,20,0.8)), url('library_bg.jpg'); background-size: cover;
+        }
+        .parchment { background: var(--paper); padding: 30px; border-radius: 8px; border: 2px solid var(--gold); width: 85%; max-width: 400px; }
+        input { padding: 12px; font-size: 1rem; border: 1px solid var(--gold); width: 80%; margin-bottom: 20px; text-align: center; }
+        .btn { background: var(--accent); color: white; border: none; padding: 15px 30px; font-size: 1.1rem; border-radius: 4px; cursor: pointer; font-weight: bold; }
+
+        /* GAME HEADER */
+        #game-ui { display: none; background: #1a110a; color: var(--paper); padding: 15px; justify-content: space-around; border-bottom: 2px solid var(--gold); }
+        .stat b { display: block; color: var(--gold); font-size: 1.2rem; }
+
+        /* MATCHING GRID */
+        #game-grid { 
+            display: none; grid-template-columns: repeat(4, 1fr); gap: 10px; 
+            padding: 20px; max-width: 500px; margin: 0 auto; 
+        }
+        .card { 
+            aspect-ratio: 1/1; background: var(--gold); border-radius: 5px; 
+            position: relative; transform-style: preserve-3d; transition: transform 0.5s; cursor: pointer; 
+        }
+        .card.flipped { transform: rotateY(180deg); }
+        .card-front, .card-back { 
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden; 
+            display: flex; align-items: center; justify-content: center; border-radius: 5px; font-size: 2rem;
+        }
+        .card-front { background: var(--paper); transform: rotateY(180deg); border: 2px solid var(--gold); }
+        .card-back { background: var(--accent); color: white; border: 2px solid var(--paper); }
+
+        #popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 200; flex-direction: column; justify-content: center; align-items: center; color: white; }
+    </style>
+</head>
+<body>
+
+    <div id="start-screen">
+        <div class="parchment">
+            <h1 style="color:var(--accent)">CHARM MATCH</h1>
+            <p>Find all 8 pairs in 1:30 minutes!</p>
+            <input type="text" id="guestName" placeholder="Enter Guest Name...">
+            <br>
+            <button class="btn" onclick="startGame()">START GAME</button>
+        </div>
+    </div>
+
+    <div id="game-ui">
+        <div class="stat">GUEST<br><b id="name-tag">---</b></div>
+        <div class="stat">TIMER<br><b id="timer">90</b>s</div>
+        <div class="stat">PAIRS<br><b id="pairs">0/8</b></div>
+    </div>
+
+    <div id="game-grid"></div>
+
+    <div id="popup">
+        <h1 id="pop-h" style="color:var(--gold); font-size: 3rem;"></h1>
+        <p id="pop-p" style="font-size: 1.2rem;"></p>
+        <button class="btn" onclick="location.reload()">PLAY AGAIN</button>
+    </div>
+
+    <script>
+        const symbols = ['📚', '☕', '🕯️', '✨', '❤️', '📜', '🎀', '🌸', '📚', '☕', '🕯️', '✨', '❤️', '📜', '🎀', '🌸'];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let time = 90;
+        let clock;
+
+        function startGame() {
+            const name = document.getElementById('guestName').value.trim();
+            if(!name) return alert("Enter your name!");
+
+            document.getElementById('name-tag').innerText = name;
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('game-ui').style.display = 'flex';
+            document.getElementById('game-grid').style.display = 'grid';
+            
+            createBoard();
+            clock = setInterval(updateTimer, 1000);
+        }
+
+        function createBoard() {
+            const grid = document.getElementById('game-grid');
+            symbols.sort(() => Math.random() - 0.5); // Shuffle cards
+
+            symbols.forEach((symbol, index) => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.symbol = symbol;
+                card.innerHTML = `
+                    <div class="card-front">${symbol}</div>
+                    <div class="card-back">?</div>
+                `;
+                card.onclick = () => flipCard(card);
+                grid.appendChild(card);
+            });
+        }
+
+        function flipCard(card) {
+            if (flippedCards.length < 2 && !card.classList.contains('flipped')) {
+                card.classList.add('flipped');
+                flippedCards.push(card);
+
+                if (flippedCards.length === 2) {
+                    checkMatch();
+                }
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            if (card1.dataset.symbol === card2.dataset.symbol) {
+                matchedPairs++;
+                document.getElementById('pairs').innerText = matchedPairs + "/8";
+                flippedCards = [];
+                if (matchedPairs === 8) finish(true);
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    flippedCards = [];
+                }, 1000);
+            }
+        }
+
+        function updateTimer() {
+            time--;
+            document.getElementById('timer').innerText = time;
+            if (time <= 0) finish(false);
+        }
+
+        function finish(win) {
+            clearInterval(clock);
+            document.getElementById('popup').style.display = 'flex';
+            document.getElementById('pop-h').innerText = win ? "EXCELLENT!" : "TIME UP!";
+            document.getElementById('pop-p').innerText = win ? "You matched all the charms!" : "You found " + matchedPairs + " pairs.";
+        }
+    </script>
+</body>
+</html>
