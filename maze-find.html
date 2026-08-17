@@ -58,12 +58,13 @@
         input { 
             padding: 12px; 
             font-size: 1rem; 
-            border: 1px solid var(--gold); 
+            border: 2px solid var(--gold); 
             border-radius: 4px; 
             width: 80%; 
             margin-bottom: 15px; 
             text-align: center;
             outline: none;
+            background: white;
         }
 
         .btn-start { 
@@ -76,6 +77,7 @@
             cursor: pointer; 
             font-weight: bold; 
             box-shadow: 0 4px 0 #5d3f29;
+            transition: 0.2s;
         }
         .btn-start:active { transform: translateY(2px); box-shadow: 0 2px 0 #5d3f29; }
 
@@ -83,19 +85,21 @@
         #game-ui { display: none; background: #1a110a; color: var(--paper); padding: 12px; position: sticky; top: 0; z-index: 100; justify-content: space-around; border-bottom: 2px solid var(--gold); }
         .stat b { display: block; color: var(--gold); font-size: 1.2rem; }
 
+        /* --- GAME BOARD --- */
         #game-area { display: none; position: relative; width: 100%; max-width: 600px; margin: 10px auto; }
         #bg-img { width: 100%; display: block; border: 3px solid var(--gold); pointer-events: none; }
         .hitbox { position: absolute; background: rgba(255,255,255,0); border-radius: 50%; z-index: 10; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
         #checklist { display: none; background: var(--paper); color: #333; width: 90%; max-width: 600px; margin: 15px auto; padding: 15px; border-radius: 5px; column-count: 2; text-align: left; list-style: none; border: 1px solid var(--gold); }
         .item { font-size: 0.8rem; margin-bottom: 5px; border-bottom: 1px dotted #ddd; }
-        .done { text-decoration: line-through; color: #bbb; }
+        .done { text-decoration: line-through; color: #bbb; font-weight: normal; }
 
         #popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 200; flex-direction: column; justify-content: center; align-items: center; padding: 20px; color: #fff; }
     </style>
 </head>
 <body>
 
+    <!-- SCREEN 1: START SCREEN -->
     <div id="start-screen">
         <img src="botanical_left.png" class="deco-botanical-l">
         <img src="botanical_right.png" class="deco-botanical-r">
@@ -106,14 +110,15 @@
         <div class="parchment-box">
             <h1>Maze Charms</h1>
             <img src="divider.png" class="heart-divider">
-            <p>Find the 10 charms hidden in the maze!</p>
+            <p>Help the book lover find 10 charms!</p>
             
             <input type="text" id="guestName" placeholder="Enter Guest Name...">
             <br>
-            <button class="btn-start" id="startBtn" onclick="beginGame()">BEGIN SEARCH</button>
+            <button class="btn-start" onclick="beginGame()">BEGIN SEARCH</button>
         </div>
     </div>
 
+    <!-- SCREEN 2: GAMEPLAY -->
     <div id="game-ui">
         <div class="stat">GUEST<br><b id="name-tag">---</b></div>
         <div class="stat">TIMER<br><b id="timer">60</b>s</div>
@@ -122,36 +127,38 @@
 
     <div id="game-area">
         <img src="maze_bg.jpg" id="bg-img">
-        <!-- Hitboxes -->
-        <div class="hitbox" onclick="tap(0, this)" style="left: 7%; top: 35%; width: 10%; height: 8%;"></div>
-        <div class="hitbox" onclick="tap(1, this)" style="left: 88%; top: 4%; width: 8%; height: 12%;"></div>
-        <div class="hitbox" onclick="tap(2, this)" style="left: 47%; top: 1%; width: 6%; height: 5%;"></div>
-        <div class="hitbox" onclick="tap(3, this)" style="left: 86%; top: 16%; width: 6%; height: 6%;"></div>
-        <div class="hitbox" onclick="tap(4, this)" style="left: 31%; top: 91%; width: 12%; height: 6%;"></div>
-        <div class="hitbox" onclick="tap(5, this)" style="left: 49%; top: 90%; width: 14%; height: 9%;"></div>
-        <div class="hitbox" onclick="tap(6, this)" style="left: 11%; top: 89%; width: 12%; height: 9%;"></div>
-        <div class="hitbox" onclick="tap(7, this)" style="left: 86%; top: 52%; width: 4%; height: 4%;"></div>
-        <div class="hitbox" onclick="tap(8, this)" style="left: 89%; top: 58%; width: 6%; height: 6%;"></div>
-        <div class="hitbox" onclick="tap(9, this)" style="left: 21%; top: 20%; width: 7%; height: 7%;"></div>
+        
+        <!-- Interactive Zones mapped to image elements -->
+        <div class="hitbox" onclick="tap(0, this)" style="left: 6%; top: 34%; width: 12%; height: 10%;"></div> <!-- Bow -->
+        <div class="hitbox" onclick="tap(1, this)" style="left: 88%; top: 3%; width: 9%; height: 13%;"></div> <!-- Quill -->
+        <div class="hitbox" onclick="tap(2, this)" style="left: 45%; top: 86%; width: 10%; height: 8%;"></div> <!-- Heart Divider -->
+        <div class="hitbox" onclick="tap(3, this)" style="left: 85%; top: 15%; width: 8%; height: 8%;"></div> <!-- Ink Pot -->
+        <div class="hitbox" onclick="tap(4, this)" style="left: 31%; top: 90%; width: 14%; height: 8%;"></div> <!-- Glasses -->
+        <div class="hitbox" onclick="tap(5, this)" style="left: 49%; top: 89%; width: 15%; height: 10%;"></div> <!-- Bookmark -->
+        <div class="hitbox" onclick="tap(6, this)" style="left: 10%; top: 88%; width: 14%; height: 10%;"></div> <!-- Pink Rose -->
+        <div class="hitbox" onclick="tap(7, this)" style="left: 85%; top: 51%; width: 8%; height: 8%;"></div> <!-- Note Heart -->
+        <div class="hitbox" onclick="tap(8, this)" style="left: 88%; top: 58%; width: 8%; height: 8%;"></div> <!-- Gold Star -->
+        <div class="hitbox" onclick="tap(9, this)" style="left: 77%; top: 90%; width: 14%; height: 9%;"></div> <!-- Cup Handle -->
     </div>
 
     <ul id="checklist">
-        <li class="item" id="L0">⚪ Hair Bow</li>
+        <li class="item" id="L0">⚪ Pink Hair Bow</li>
         <li class="item" id="L1">⚪ Blue Quill</li>
-        <li class="item" id="L2">⚪ Heart Divider</li>
+        <li class="item" id="L2">⚪ Heart Scroll</li>
         <li class="item" id="L3">⚪ Ink Pot</li>
         <li class="item" id="L4">⚪ Round Glasses</li>
-        <li class="item" id="L5">⚪ Bookmark</li>
+        <li class="item" id="L5">⚪ Floral Bookmark</li>
         <li class="item" id="L6">⚪ Rose on Book</li>
-        <li class="item" id="L7">⚪ Note Heart</li>
-        <li class="item" id="L8">⚪ Gold Star</li>
-        <li class="item" id="L9">⚪ Teacup Handle</li>
+        <li class="item" id="L7">⚪ Small Note Heart</li>
+        <li class="item" id="L8">⚪ Golden Star</li>
+        <li class="item" id="L9">⚪ Tea Cup</li>
     </ul>
 
+    <!-- SCREEN 3: POPUP -->
     <div id="popup">
         <h1 id="pop-h" style="color:var(--gold)"></h1>
         <p id="pop-p"></p>
-        <button class="btn-start" onclick="location.reload()">PLAY AGAIN</button>
+        <button class="btn-start" onclick="location.reload()">TRY AGAIN</button>
     </div>
 
     <script>
@@ -161,15 +168,16 @@
         let clock;
 
         function beginGame() {
+            console.log("Button Clicked"); // Debug check
             const input = document.getElementById('guestName');
             const name = input.value.trim();
             
             if(!name) {
-                input.style.border = "2px solid red";
                 alert("Please enter your name first!");
                 return;
             }
 
+            // Hide/Show Logic
             document.getElementById('name-tag').innerText = name;
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('game-ui').style.display = 'flex';
@@ -188,6 +196,7 @@
             const li = document.getElementById('L' + id);
             if(!active || li.classList.contains('done')) return;
 
+            // Update item
             li.classList.add('done');
             li.innerText = li.innerText.replace('⚪', '✅');
             el.style.background = "rgba(197, 160, 89, 0.4)";
@@ -204,7 +213,7 @@
             document.getElementById('popup').style.display = 'flex';
             if(win) {
                 document.getElementById('pop-h').innerText = "VICTORY!";
-                document.getElementById('pop-p').innerText = "Amazing! You found all the charms!";
+                document.getElementById('pop-p').innerText = "Magnificent! You found all 10 charms!";
             } else {
                 document.getElementById('pop-h').innerText = "TIME UP!";
                 document.getElementById('pop-p').innerText = "You found " + found + " charms.";
