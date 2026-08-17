@@ -16,7 +16,7 @@
             overflow-x: hidden; 
         }
 
-        /* --- PRETTY START SCREEN --- */
+        /* --- START SCREEN --- */
         #start-screen { 
             height: 100vh; 
             width: 100%;
@@ -24,79 +24,78 @@
             flex-direction: column; 
             justify-content: center; 
             align-items: center; 
-            background: linear-gradient(rgba(44, 30, 20, 0.7), rgba(44, 30, 20, 0.7)), url('maze_bg.jpg');
+            background: linear-gradient(rgba(44, 30, 20, 0.75), rgba(44, 30, 20, 0.75)), url('maze_bg.jpg');
             background-size: cover;
+            background-position: center;
             position: relative;
-            overflow: hidden;
         }
 
-        /* Decorative Botanical Corners */
-        .deco-botanical-l { position: absolute; top: -20px; left: -20px; width: 250px; opacity: 0.9; pointer-events: none; }
-        .deco-botanical-r { position: absolute; top: -20px; right: -20px; width: 250px; opacity: 0.9; pointer-events: none; }
-        .deco-crate { position: absolute; bottom: 10px; left: 10px; width: 220px; pointer-events: none; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.5)); }
-        .deco-book { position: absolute; bottom: 10px; right: 10px; width: 200px; pointer-events: none; }
-        .deco-sparkle { position: absolute; top: 10%; right: 10%; width: 100px; animation: blink 3s infinite; }
+        /* Decorations */
+        .deco-botanical-l { position: absolute; top: -10px; left: -10px; width: 220px; pointer-events: none; z-index: 5; }
+        .deco-botanical-r { position: absolute; top: -10px; right: -10px; width: 220px; pointer-events: none; z-index: 5; }
+        .deco-crate { position: absolute; bottom: 10px; left: 10px; width: 180px; pointer-events: none; }
+        .deco-book { position: absolute; bottom: 10px; right: 10px; width: 180px; pointer-events: none; }
+        .deco-sparkle { position: absolute; top: 10%; right: 10%; width: 80px; pointer-events: none; animation: blink 3s infinite; }
 
         @keyframes blink { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
         .parchment-box { 
             background: var(--paper); 
-            padding: 40px 30px; 
-            border-radius: 10px; 
+            padding: 40px 25px; 
+            border-radius: 8px; 
             border: 2px solid var(--gold);
-            box-shadow: 0 0 40px rgba(0,0,0,0.6);
+            box-shadow: 0 10px 50px rgba(0,0,0,0.8);
             width: 85%; 
-            max-width: 450px; 
-            z-index: 10;
+            max-width: 400px; 
+            z-index: 20;
             position: relative;
         }
 
-        .heart-divider { width: 80%; max-width: 300px; margin: 15px auto; display: block; }
-
-        h1 { font-size: 2.2rem; margin: 0; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; line-height: 1.1; }
-        p { font-style: italic; color: var(--wood); margin-bottom: 25px; margin-top: 10px; }
+        .heart-divider { width: 200px; margin: 15px auto; display: block; }
+        h1 { font-size: 1.8rem; margin: 0; color: var(--accent); text-transform: uppercase; }
+        p { font-style: italic; font-size: 0.9rem; margin: 10px 0 20px 0; }
 
         input { 
-            padding: 15px; 
-            font-size: 1.1rem; 
+            padding: 12px; 
+            font-size: 1rem; 
             border: 1px solid var(--gold); 
             border-radius: 4px; 
             width: 80%; 
-            margin-bottom: 20px; 
+            margin-bottom: 15px; 
             text-align: center;
+            outline: none;
         }
 
         .btn-start { 
             background: var(--accent); 
             color: #fff; 
             border: none; 
-            padding: 15px 45px; 
-            font-size: 1.2rem; 
-            border-radius: 5px; 
+            padding: 14px 40px; 
+            font-size: 1.1rem; 
+            border-radius: 4px; 
             cursor: pointer; 
             font-weight: bold; 
-            transition: 0.2s;
+            box-shadow: 0 4px 0 #5d3f29;
         }
-        .btn-start:hover { transform: scale(1.05); }
+        .btn-start:active { transform: translateY(2px); box-shadow: 0 2px 0 #5d3f29; }
 
         /* --- GAME UI --- */
-        #game-ui { display: none; background: #2c1e14; color: var(--paper); padding: 10px; position: sticky; top: 0; z-index: 100; justify-content: space-around; border-bottom: 2px solid var(--gold); }
-        .stat span { display: block; color: var(--gold); font-weight: bold; font-size: 1.3rem; }
+        #game-ui { display: none; background: #1a110a; color: var(--paper); padding: 12px; position: sticky; top: 0; z-index: 100; justify-content: space-around; border-bottom: 2px solid var(--gold); }
+        .stat b { display: block; color: var(--gold); font-size: 1.2rem; }
 
         #game-area { display: none; position: relative; width: 100%; max-width: 600px; margin: 10px auto; }
-        #bg-img { width: 100%; display: block; border: 4px solid var(--gold); pointer-events: none; }
-        .hitbox { position: absolute; background: rgba(255,255,255,0); border-radius: 50%; z-index: 5; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        #bg-img { width: 100%; display: block; border: 3px solid var(--gold); pointer-events: none; }
+        .hitbox { position: absolute; background: rgba(255,255,255,0); border-radius: 50%; z-index: 10; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
-        #checklist { display: none; background: var(--paper); color: #333; width: 90%; max-width: 600px; margin: 15px auto; padding: 20px; border-radius: 5px; column-count: 2; text-align: left; list-style: none; border: 1px solid var(--gold); }
-        .item { font-size: 0.85rem; margin-bottom: 8px; border-bottom: 1px dotted #ccc; padding-bottom: 2px; }
-        .done { text-decoration: line-through; color: #aaa; opacity: 0.5; }
+        #checklist { display: none; background: var(--paper); color: #333; width: 90%; max-width: 600px; margin: 15px auto; padding: 15px; border-radius: 5px; column-count: 2; text-align: left; list-style: none; border: 1px solid var(--gold); }
+        .item { font-size: 0.8rem; margin-bottom: 5px; border-bottom: 1px dotted #ddd; }
+        .done { text-decoration: line-through; color: #bbb; }
 
-        #popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; flex-direction: column; justify-content: center; align-items: center; padding: 20px; color: #fff; }
+        #popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 200; flex-direction: column; justify-content: center; align-items: center; padding: 20px; color: #fff; }
     </style>
 </head>
 <body>
 
-    <!-- SCREEN 1: PRETTY START PAGE -->
     <div id="start-screen">
         <img src="botanical_left.png" class="deco-botanical-l">
         <img src="botanical_right.png" class="deco-botanical-r">
@@ -105,38 +104,112 @@
         <img src="book_flower.png" class="deco-book">
 
         <div class="parchment-box">
-            <h1>Charms of the Maze</h1>
+            <h1>Maze Charms</h1>
             <img src="divider.png" class="heart-divider">
-            <p>Can you find 10 literary charms before the time runs out?</p>
+            <p>Find the 10 charms hidden in the maze!</p>
             
-            <input type="text" id="guestName" placeholder="Enter Guest Name..." autocomplete="off">
+            <input type="text" id="guestName" placeholder="Enter Guest Name...">
             <br>
-            <button class="btn-start" onclick="begin()">BEGIN SEARCH</button>
+            <button class="btn-start" id="startBtn" onclick="beginGame()">BEGIN SEARCH</button>
         </div>
     </div>
 
-    <!-- SCREEN 2: GAME UI -->
     <div id="game-ui">
-        <div class="stat">GUEST<br><span id="name-tag">---</span></div>
-        <div class="stat">TIMER<br><span id="timer">60</span>s</div>
-        <div class="stat">FOUND<br><span id="counter">0/10</span></div>
+        <div class="stat">GUEST<br><b id="name-tag">---</b></div>
+        <div class="stat">TIMER<br><b id="timer">60</b>s</div>
+        <div class="stat">FOUND<br><b id="counter">0/10</b></div>
     </div>
 
     <div id="game-area">
         <img src="maze_bg.jpg" id="bg-img">
-        
-        <!-- HIDDEN CHARMS (Approximate coordinates for the Maze Image) -->
-        <div class="hitbox" onclick="tap(0, this)" style="left: 7%; top: 35%; width: 10%; height: 8%;"></div> <!-- 1. Pink Hair Bow -->
-        <div class="hitbox" onclick="tap(1, this)" style="left: 88%; top: 4%; width: 8%; height: 12%;"></div> <!-- 2. Blue Quill -->
-        <div class="hitbox" onclick="tap(2, this)" style="left: 47%; top: 1%; width: 6%; height: 5%;"></div>  <!-- 3. Gold Heart Divider -->
-        <div class="hitbox" onclick="tap(3, this)" style="left: 86%; top: 16%; width: 6%; height: 6%;"></div> <!-- 4. Small Ink Pot -->
-        <div class="hitbox" onclick="tap(4, this)" style="left: 31%; top: 91%; width: 12%; height: 6%;"></div><!-- 5. Round Glasses -->
-        <div class="hitbox" onclick="tap(5, this)" style="left: 49%; top: 90%; width: 14%; height: 9%;"></div><!-- 6. Flower Bookmark -->
-        <div class="hitbox" onclick="tap(6, this)" style="left: 11%; top: 89%; width: 12%; height: 9%;"></div><!-- 7. Pink Rose on Book -->
-        <div class="hitbox" onclick="tap(7, this)" style="left: 86%; top: 52%; width: 4%; height: 4%;"></div> <!-- 8. Note Heart -->
-        <div class="hitbox" onclick="tap(8, this)" style="left: 89%; top: 58%; width: 6%; height: 6%;"></div> <!-- 9. Gold Star -->
-        <div class="hitbox" onclick="tap(9, this)" style="left: 21%; top: 20%; width: 7%; height: 7%;"></div> <!-- 10. Teacup Handle -->
+        <!-- Hitboxes -->
+        <div class="hitbox" onclick="tap(0, this)" style="left: 7%; top: 35%; width: 10%; height: 8%;"></div>
+        <div class="hitbox" onclick="tap(1, this)" style="left: 88%; top: 4%; width: 8%; height: 12%;"></div>
+        <div class="hitbox" onclick="tap(2, this)" style="left: 47%; top: 1%; width: 6%; height: 5%;"></div>
+        <div class="hitbox" onclick="tap(3, this)" style="left: 86%; top: 16%; width: 6%; height: 6%;"></div>
+        <div class="hitbox" onclick="tap(4, this)" style="left: 31%; top: 91%; width: 12%; height: 6%;"></div>
+        <div class="hitbox" onclick="tap(5, this)" style="left: 49%; top: 90%; width: 14%; height: 9%;"></div>
+        <div class="hitbox" onclick="tap(6, this)" style="left: 11%; top: 89%; width: 12%; height: 9%;"></div>
+        <div class="hitbox" onclick="tap(7, this)" style="left: 86%; top: 52%; width: 4%; height: 4%;"></div>
+        <div class="hitbox" onclick="tap(8, this)" style="left: 89%; top: 58%; width: 6%; height: 6%;"></div>
+        <div class="hitbox" onclick="tap(9, this)" style="left: 21%; top: 20%; width: 7%; height: 7%;"></div>
     </div>
 
     <ul id="checklist">
-        <li class="item" id="L0">⚪ Pink Hair Bow</li>
+        <li class="item" id="L0">⚪ Hair Bow</li>
+        <li class="item" id="L1">⚪ Blue Quill</li>
+        <li class="item" id="L2">⚪ Heart Divider</li>
+        <li class="item" id="L3">⚪ Ink Pot</li>
+        <li class="item" id="L4">⚪ Round Glasses</li>
+        <li class="item" id="L5">⚪ Bookmark</li>
+        <li class="item" id="L6">⚪ Rose on Book</li>
+        <li class="item" id="L7">⚪ Note Heart</li>
+        <li class="item" id="L8">⚪ Gold Star</li>
+        <li class="item" id="L9">⚪ Teacup Handle</li>
+    </ul>
+
+    <div id="popup">
+        <h1 id="pop-h" style="color:var(--gold)"></h1>
+        <p id="pop-p"></p>
+        <button class="btn-start" onclick="location.reload()">PLAY AGAIN</button>
+    </div>
+
+    <script>
+        let found = 0;
+        let time = 60;
+        let active = false;
+        let clock;
+
+        function beginGame() {
+            const input = document.getElementById('guestName');
+            const name = input.value.trim();
+            
+            if(!name) {
+                input.style.border = "2px solid red";
+                alert("Please enter your name first!");
+                return;
+            }
+
+            document.getElementById('name-tag').innerText = name;
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('game-ui').style.display = 'flex';
+            document.getElementById('game-area').style.display = 'block';
+            document.getElementById('checklist').style.display = 'block';
+            
+            active = true;
+            clock = setInterval(() => {
+                time--;
+                document.getElementById('timer').innerText = time;
+                if(time <= 0) finish(false);
+            }, 1000);
+        }
+
+        function tap(id, el) {
+            const li = document.getElementById('L' + id);
+            if(!active || li.classList.contains('done')) return;
+
+            li.classList.add('done');
+            li.innerText = li.innerText.replace('⚪', '✅');
+            el.style.background = "rgba(197, 160, 89, 0.4)";
+            el.style.border = "2px solid gold";
+
+            found++;
+            document.getElementById('counter').innerText = found + "/10";
+            if(found === 10) finish(true);
+        }
+
+        function finish(win) {
+            active = false;
+            clearInterval(clock);
+            document.getElementById('popup').style.display = 'flex';
+            if(win) {
+                document.getElementById('pop-h').innerText = "VICTORY!";
+                document.getElementById('pop-p').innerText = "Amazing! You found all the charms!";
+            } else {
+                document.getElementById('pop-h').innerText = "TIME UP!";
+                document.getElementById('pop-p').innerText = "You found " + found + " charms.";
+            }
+        }
+    </script>
+</body>
+</html>
