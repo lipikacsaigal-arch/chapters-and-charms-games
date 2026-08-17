@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chapters & Charms: Hidden Objects II</title>
+    <style>
+        :root { --wood: #4a3728; --gold: #c5a059; --paper: #f4ece1; }
+        body { font-family: 'Georgia', serif; background: var(--wood); color: var(--paper); margin: 0; text-align: center; overflow-x: hidden; }
+        
+        /* Start Screen */
+        #start-screen { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.85); }
+        .box { background: var(--paper); padding: 30px; border-radius: 15px; border: 5px solid var(--gold); color: #333; width: 85%; max-width: 400px; }
+        input { padding: 12px; font-size: 1.1rem; border: 2px solid var(--gold); border-radius: 8px; width: 90%; margin-bottom: 20px; text-align: center; }
+        .btn { background: var(--wood); color: white; border: none; padding: 15px 35px; font-size: 1.2rem; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        /* Game UI */
+        #game-ui { display: none; background: rgba(0,0,0,0.9); padding: 10px; position: sticky; top: 0; z-index: 100; justify-content: space-around; border-bottom: 2px solid var(--gold); }
+        .stat { font-size: 0.85rem; }
+        .stat span { display: block; color: var(--gold); font-weight: bold; font-size: 1.2rem; }
+
+        /* Game Container */
+        #game-area { display: none; position: relative; width: 100%; max-width: 600px; margin: 10px auto; }
+        #bg-img { width: 100%; display: block; border: 3px solid var(--gold); pointer-events: none; }
+        
+        /* Hitboxes - Invisible Zones */
+        .hitbox { position: absolute; background: rgba(255,255,255,0); border-radius: 50%; z-index: 5; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+        /* Checklist */
+        #checklist { display: none; background: var(--paper); color: #333; width: 90%; max-width: 600px; margin: 15px auto; padding: 15px; border-radius: 10px; column-count: 2; text-align: left; list-style: none; }
+        .item { font-size: 0.8rem; margin-bottom: 6px; font-weight: bold; }
+        .done { text-decoration: line-through; color: #aaa; opacity: 0.5; }
+
+        /* Result Popup */
+        #popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 200; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <!-- SCREEN 1: NAME ENTRY -->
+    <div id="start-screen">
+        <div class="box">
+            <h1 style="margin:0 0 10px 0; color:var(--wood)">Chapters & Charms</h1>
+            <p><strong>Seek & Find Challenge</strong></p>
+            <input type="text" id="guestName" placeholder="Enter Guest Name..." autocomplete="off">
+            <br>
+            <button class="btn" onclick="begin()">START GAME</button>
+            <p style="font-size:0.8rem; margin-top:15px; color:#555">You have 60 seconds to find 10 items.</p>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: GAME UI -->
+    <div id="game-ui">
+        <div class="stat">GUEST<br><span id="name-tag">---</span></div>
+        <div class="stat">TIMER<br><span id="timer">60</span>s</div>
+        <div class="stat">FOUND<br><span id="counter">0/10</span></div>
+    </div>
+
+    <div id="game-area">
+        <img src="library_v2.jpg" id="bg-img">
+        
+        <!-- ITEM HITBOXES (Mapped from your Answer Key circles) -->
+        <div class="hitbox" onclick="tap(0, this)" style="left: 11%; top: 22%; width: 7%; height: 6%;"></div> <!-- 1. Gold Key -->
+        <div class="hitbox" onclick="tap(1, this)" style="left: 20%; top: 18%; width: 7%; height: 6%;"></div> <!-- 2. Feather Quill -->
+        <div class="hitbox" onclick="tap(2, this)" style="left: 84%; top: 25%; width: 7%; height: 6%;"></div> <!-- 3. Miniature Teacup -->
+        <div class="hitbox" onclick="tap(3, this)" style="left: 10%; top: 87%; width: 8%; height: 7%;"></div> <!-- 4. Tiny Open Book -->
+        <div class="hitbox" onclick="tap(4, this)" style="left: 34%; top: 82%; width: 9%; height: 7%;"></div> <!-- 5. Round Spectacles -->
+        <div class="hitbox" onclick="tap(5, this)" style="left: 5%; top: 52%; width: 7%; height: 6%;"></div>  <!-- 6. Little Heart Charm -->
+        <div class="hitbox" onclick="tap(6, this)" style="left: 48%; top: 7%; width: 6%; height: 6%;"></div>  <!-- 7. Extra Gold Star -->
+        <div class="hitbox" onclick="tap(7, this)" style="left: 23%; top: 74%; width: 6%; height: 6%;"></div> <!-- 8. Second Lit Candle -->
+        <div class="hitbox" onclick="tap(8, this)" style="left: 55%; top: 56%; width: 8%; height: 7%;"></div> <!-- 9. Rose Ribbon Bow -->
+        <div class="hitbox" onclick="tap(9, this)" style="left: 90%; top: 44%; width: 7%; height: 6%;"></div> <!-- 10. Four-leaf Clover -->
+    </div>
+
+    <ul id="checklist">
+        <li class="item" id="L0">⚪ Tiny Gold Key</li>
+        <li class="item" id="L1">⚪ Feather Quill</li>
+        <li class="item" id="L2">⚪ Miniature Teacup</li>
+        <li class="item" id="L3">⚪ Tiny Open Book</li>
+        <li class="item" id="L4">⚪ Round Spectacles</li>
+        <li class="item" id="L5">⚪ Heart Charm</li>
+        <li class="item" id="L6">⚪ Extra Gold Star</li>
+        <li class="item" id="L7">⚪ Second Lit Candle</li>
+        <li class="item" id="L8">⚪ Rose Ribbon Bow</li>
+        <li class="item" id="L9">⚪ Four-leaf Clover</li>
+    </ul>
+
+    <!-- SCREEN 3: RESULTS -->
+    <div id="popup">
+        <h1 id="pop-h" style="color:var(--gold); font-size: 2.5rem;"></h1>
+        <p id="pop-p" style="font-size: 1.2rem;"></p>
+        <button class="btn" onclick="location.reload()">PLAY AGAIN</button>
+        <br><br>
+        <button class="btn" onclick="window.location.href='index.html'" style="background:#666; padding:10px 20px; font-size:0.9rem">BACK TO TAMBOLA</button>
+    </div>
+
+    <script>
+        let found = 0;
+        let time = 60;
+        let active = false;
+        let clock;
+
+        function begin() {
+            const user = document.getElementById('guestName').value;
+            if(!user) return alert("Enter your name to start!");
+
+            document.getElementById('name-tag').innerText = user;
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('game-ui').style.display = 'flex';
+            document.getElementById('game-area').style.display = 'block';
+            document.getElementById('checklist').style.display = 'block';
+            
+            active = true;
+            clock = setInterval(() => {
+                time--;
+                document.getElementById('timer').innerText = time;
+                if(time <= 0) finish(false);
+            }, 1000);
+        }
+
+        function tap(id, el) {
+            const list = document.getElementById('L' + id);
+            if(!active || list.classList.contains('done')) return;
+
+            list.classList.add('done');
+            list.innerText = list.innerText.replace('⚪', '✅');
+            el.style.background = "rgba(197, 160, 89, 0.4)";
+            el.style.border = "2px solid gold";
+
+            found++;
+            document.getElementById('counter').innerText = found + "/10";
+            if(found === 10) finish(true);
+        }
+
+        function finish(win) {
+            active = false;
+            clearInterval(clock);
+            document.getElementById('popup').style.display = 'flex';
+            const h = document.getElementById('pop-h');
+            const p = document.getElementById('pop-p');
+
+            if(win) {
+                h.innerText = "VICTORY!";
+                p.innerText = "Excellent! You found all objects in " + (60 - time) + " seconds!";
+            } else {
+                h.innerText = "TIME'S UP!";
+                p.innerText = "You found " + found + " objects. The library holds its secrets...";
+            }
+        }
+    </script>
+</body>
+</html>
