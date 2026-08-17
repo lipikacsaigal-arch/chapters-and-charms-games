@@ -1,0 +1,131 @@
+code
+Html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chapters & Charms: Hidden Objects</title>
+    <style>
+        :root { --brown: #4a3728; --gold: #c5a059; --paper: #f4ece1; }
+        body { font-family: 'Georgia', serif; background: var(--brown); color: var(--paper); margin: 0; text-align: center; overflow-x: hidden; }
+        #start-screen { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        input { padding: 12px; font-size: 1.1rem; border-radius: 5px; border: none; width: 80%; max-width: 300px; margin-bottom: 15px; }
+        button { background: var(--gold); color: white; border: none; padding: 12px 30px; font-size: 1.1rem; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        #ui { display: none; background: rgba(0,0,0,0.85); padding: 10px; position: sticky; top: 0; z-index: 100; justify-content: space-around; border-bottom: 2px solid var(--gold); }
+        #game-area { display: none; position: relative; width: 100%; max-width: 600px; margin: 10px auto; }
+        #library-img { width: 100%; display: block; border: 3px solid var(--gold); pointer-events: none; }
+        .target { position: absolute; background: rgba(255,255,255,0); border-radius: 50%; z-index: 5; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        #list { display: none; background: var(--paper); color: #333; width: 90%; max-width: 600px; margin: 15px auto; padding: 15px; border-radius: 10px; column-count: 2; text-align: left; list-style: none; }
+        .item { font-size: 0.9rem; margin-bottom: 5px; }
+        .found { text-decoration: line-through; color: #aaa; opacity: 0.5; }
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="start-screen">
+        <h1 style="color:var(--gold)">Library Seek & Find</h1>
+        <p>Find 10 items in 60 seconds!</p>
+        <input type="text" id="playerName" placeholder="Enter Guest Name">
+        <button onclick="play()">START GAME</button>
+        <p style="margin-top:20px; font-size:0.8rem; opacity:0.7">Hidden objects are tiny. Look closely!</p>
+    </div>
+
+    <div id="ui">
+        <div>Guest: <b id="p-name" style="color:var(--gold)"></b></div>
+        <div>Timer: <b id="timer">60</b>s</div>
+        <div>Found: <b id="count">0</b>/10</div>
+    </div>
+
+    <div id="game-area">
+        <img src="library.jpg" id="library-img">
+        
+        <!-- These are the hidden hitboxes for the 10 items -->
+        <div class="target" onclick="found(0, this)" style="left: 3%; top: 25%; width: 10%; height: 8%;"></div> <!-- Silver Heart -->
+        <div class="target" onclick="found(1, this)" style="left: 23%; top: 33%; width: 7%; height: 6%;"></div> <!-- Gold Star -->
+        <div class="target" onclick="found(2, this)" style="left: 60%; top: 60%; width: 8%; height: 7%;"></div> <!-- Blue Butterfly -->
+        <div class="target" onclick="found(3, this)" style="left: 40%; top: 57%; width: 12%; height: 10%;"></div> <!-- Cat -->
+        <div class="target" onclick="found(4, this)" style="left: 30%; top: 86%; width: 10%; height: 7%;"></div> <!-- Magnifying Glass -->
+        <div class="target" onclick="found(5, this)" style="left: 25%; top: 78%; width: 10%; height: 7%;"></div> <!-- Envelope -->
+        <div class="target" onclick="found(6, this)" style="left: 83%; top: 70%; width: 8%; height: 6%;"></div> <!-- Teapot Butterfly -->
+        <div class="target" onclick="found(7, this)" style="left: 82%; top: 76%; width: 8%; height: 6%;"></div> <!-- Saucer Butterfly -->
+        <div class="target" onclick="found(8, this)" style="left: 12%; top: 22%; width: 5%; height: 5%;"></div> <!-- Wall Star -->
+        <div class="target" onclick="found(9, this)" style="left: 26%; top: 63%; width: 5%; height: 7%;"></div> <!-- Tiny Candle -->
+    </div>
+
+    <ul id="list">
+        <li class="item" id="i0">⚪ Silver Heart</li>
+        <li class="item" id="i1">⚪ Gold Star</li>
+        <li class="item" id="i2">⚪ Blue Butterfly</li>
+        <li class="item" id="i3">⚪ Sleeping Cat</li>
+        <li class="item" id="i4">⚪ Magnifying Glass</li>
+        <li class="item" id="i5">⚪ White Envelope</li>
+        <li class="item" id="i6">⚪ Teapot Butterfly</li>
+        <li class="item" id="i7">⚪ Saucer Butterfly</li>
+        <li class="item" id="i8">⚪ Wall Star</li>
+        <li class="item" id="i9">⚪ Tiny Candle</li>
+    </ul>
+
+    <div id="overlay">
+        <h1 id="res-title"></h1>
+        <p id="res-body"></p>
+        <button onclick="location.reload()">TRY AGAIN</button>
+        <br><br>
+        <button onclick="window.location.href='index.html'" style="background:#555">BACK TO TAMBOLA</button>
+    </div>
+
+    <script>
+        let score = 0;
+        let time = 60;
+        let clock;
+
+        function play() {
+            const n = document.getElementById('playerName').value;
+            if(!n) return alert("Please enter your name, guest!");
+            document.getElementById('p-name').innerText = n;
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('ui').style.display = 'flex';
+            document.getElementById('game-area').style.display = 'block';
+            document.getElementById('list').style.display = 'block';
+            
+            clock = setInterval(() => {
+                time--;
+                document.getElementById('timer').innerText = time;
+                if(time <= 0) end(false);
+            }, 1000);
+        }
+
+        function found(idx, el) {
+            const li = document.getElementById('i' + idx);
+            if(li.classList.contains('found')) return;
+            
+            li.classList.add('found');
+            li.innerText = li.innerText.replace('⚪', '✅');
+            el.style.border = "2px solid gold";
+            el.style.background = "rgba(197, 160, 89, 0.3)";
+            
+            score++;
+            document.getElementById('count').innerText = score;
+            if(score === 10) end(true);
+        }
+
+        function end(win) {
+            clearInterval(clock);
+            document.getElementById('overlay').style.display = 'flex';
+            const title = document.getElementById('res-title');
+            const body = document.getElementById('res-body');
+            
+            if(win) {
+                title.innerText = "VICTORY!";
+                title.style.color = "#c5a059";
+                body.innerText = "Amazing! You found all 10 items with " + time + "s left!";
+            } else {
+                title.innerText = "TIME'S UP!";
+                title.style.color = "red";
+                body.innerText = "You found " + score + " items. Try one more time?";
+            }
+        }
+    </script>
+</body>
+</html>
