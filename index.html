@@ -3,113 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chapters & Charms: Hidden Library</title>
+    <title>Chapters & Charms: Hidden Objects</title>
     <style>
-        :root { --vintage-brown: #4a3728; --paper-color: #f4ece1; --accent-gold: #c5a059; }
-        body { font-family: 'Georgia', serif; background-color: var(--vintage-brown); color: var(--paper-color); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; touch-action: manipulation; }
-        #setup-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; text-align: center; padding: 20px; }
-        input { padding: 12px; font-size: 1.2rem; border-radius: 8px; border: none; margin-bottom: 15px; width: 80%; max-width: 300px; }
-        button { padding: 12px 30px; font-size: 1.2rem; background: var(--accent-gold); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        #game-header { width: 100%; background: rgba(0,0,0,0.7); padding: 10px 0; display: none; justify-content: space-around; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-gold); }
-        #game-container { display: none; position: relative; width: 100%; max-width: 600px; margin: 10px auto; }
-        #library-img { width: 100%; display: block; border: 2px solid var(--accent-gold); pointer-events: none; }
-        .item-target { position: absolute; background: rgba(255, 255, 255, 0); border-radius: 50%; cursor: pointer; z-index: 10; -webkit-tap-highlight-color: transparent; }
-        #checklist { display: none; background: var(--paper-color); color: #333; width: 90%; max-width: 600px; margin: 15px auto; padding: 15px; border-radius: 10px; column-count: 2; list-style: none; }
-        .checklist-item { font-size: 0.85rem; margin-bottom: 5px; }
-        .found { text-decoration: line-through; color: #888; opacity: 0.6; }
-        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; text-align: center; }
+        :root { --wood: #4a3728; --gold: #c5a059; --paper: #f4ece1; }
+        body { font-family: 'Georgia', serif; background: var(--wood); color: var(--paper); margin: 0; text-align: center; overflow-x: hidden; }
+        
+        /* Start Screen */
+        #start-screen { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        input { padding: 12px; font-size: 1rem; border-radius: 5px; border: none; width: 250px; margin-bottom: 10px; }
+        button { background: var(--gold); color: white; border: none; padding: 12px 30px; font-size: 1.1rem; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+        /* Game Header */
+        #ui { display: none; background: rgba(0,0,0,0.8); padding: 10px; position: sticky; top: 0; z-index: 100; justify-content: space-around; border-bottom: 2px solid var(--gold); }
+        
+        /* Game Board */
+        #game-area { display: none; position: relative; width: 100%; max-width: 600px; margin: 10px auto; }
+        #library-img { width: 100%; display: block; border: 3px solid var(--gold); pointer-events: none; }
+        
+        /* Hidden Hitboxes */
+        .target { position: absolute; background: rgba(255,255,255,0); border-radius: 50%; z-index: 5; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+        /* Checklist */
+        #list { display: none; background: var(--paper); color: #333; width: 90%; max-width: 600px; margin: 15px auto; padding: 15px; border-radius: 10px; column-count: 2; text-align: left; list-style: none; }
+        .item { font-size: 0.9rem; margin-bottom: 5px; }
+        .found { text-decoration: line-through; color: #aaa; }
+
+        /* Results */
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; flex-direction: column; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
 
-    <div id="setup-screen">
-        <h1 style="color:var(--accent-gold)">Chapters & Charms</h1>
-        <p>Can you find 10 hidden objects in 60 seconds?</p>
-        <input type="text" id="guestName" placeholder="Enter Guest Name..." required>
-        <button onclick="startGame()">START GAME</button>
+    <div id="start-screen">
+        <h1 style="color:var(--gold)">Library Seek & Find</h1>
+        <p>Find 10 items in 60 seconds!</p>
+        <input type="text" id="playerName" placeholder="Enter Guest Name">
+        <br>
+        <button onclick="play()">START GAME</button>
     </div>
 
-    <div id="game-header">
-        <div>Guest: <b id="display-name" style="color:var(--accent-gold)"></b></div>
-        <div>Time: <b id="timer">60</b>s</div>
-        <div>Found: <b id="counter">0</b>/10</div>
+    <div id="ui">
+        <div>Guest: <b id="p-name" style="color:var(--gold)"></b></div>
+        <div>Timer: <b id="timer">60</b>s</div>
+        <div>Found: <b id="count">0</b>/10</div>
     </div>
 
-    <div id="game-container">
+    <div id="game-area">
         <img src="library.jpg" id="library-img">
-        <!-- HITBOXES -->
-        <div class="item-target" onclick="find(0, this)" style="left: 3%; top: 25%; width: 9%; height: 8%;"></div>
-        <div class="item-target" onclick="find(1, this)" style="left: 23%; top: 33%; width: 7%; height: 6%;"></div>
-        <div class="item-target" onclick="find(2, this)" style="left: 60%; top: 60%; width: 7%; height: 6%;"></div>
-        <div class="item-target" onclick="find(3, this)" style="left: 40%; top: 57%; width: 12%; height: 10%;"></div>
-        <div class="item-target" onclick="find(4, this)" style="left: 30%; top: 86%; width: 10%; height: 7%;"></div>
-        <div class="item-target" onclick="find(5, this)" style="left: 25%; top: 78%; width: 10%; height: 7%;"></div>
-        <div class="item-target" onclick="find(6, this)" style="left: 83%; top: 70%; width: 7%; height: 6%;"></div>
-        <div class="item-target" onclick="find(7, this)" style="left: 82%; top: 76%; width: 7%; height: 6%;"></div>
-        <div class="item-target" onclick="find(8, this)" style="left: 12%; top: 22%; width: 5%; height: 5%;"></div>
-        <div class="item-target" onclick="find(9, this)" style="left: 26%; top: 63%; width: 5%; height: 7%;"></div>
+        
+        <!-- Interactive Zones (Coordinates based on the image) -->
+        <div class="target" onclick="found(0, this)" style="left: 4%; top: 26%; width: 8%; height: 7%;"></div> <!-- Heart -->
+        <div class="target" onclick="found(1, this)" style="left: 24%; top: 34%; width: 6%; height: 5%;"></div> <!-- Star 1 -->
+        <div class="target" onclick="found(2, this)" style="left: 60%; top: 61%; width: 7%; height: 6%;"></div> <!-- Blue Butterfly -->
+        <div class="target" onclick="found(3, this)" style="left: 40%; top: 58%; width: 11%; height: 9%;"></div> <!-- Cat -->
+        <div class="target" onclick="found(4, this)" style="left: 31%; top: 87%; width: 9%; height: 6%;"></div> <!-- Lens -->
+        <div class="target" onclick="found(5, this)" style="left: 26%; top: 79%; width: 9%; height: 6%;"></div> <!-- Envelope -->
+        <div class="target" onclick="found(6, this)" style="left: 83%; top: 71%; width: 6%; height: 6%;"></div> <!-- Tea Butterfly 1 -->
+        <div class="target" onclick="found(7, this)" style="left: 82%; top: 77%; width: 6%; height: 6%;"></div> <!-- Tea Butterfly 2 -->
+        <div class="target" onclick="found(8, this)" style="left: 12%; top: 23%; width: 5%; height: 5%;"></div> <!-- Star 2 -->
+        <div class="target" onclick="found(9, this)" style="left: 26%; top: 64%; width: 5%; height: 7%;"></div> <!-- Small Candle -->
     </div>
 
-    <ul id="checklist">
-        <li class="checklist-item" id="item-0">⚪ Silver Heart</li>
-        <li class="checklist-item" id="item-1">⚪ Gold Star</li>
-        <li class="checklist-item" id="item-2">⚪ Blue Butterfly</li>
-        <li class="checklist-item" id="item-3">⚪ Sleeping Cat</li>
-        <li class="checklist-item" id="item-4">⚪ Magnifying Glass</li>
-        <li class="checklist-item" id="item-5">⚪ White Envelope</li>
-        <li class="checklist-item" id="item-6">⚪ Teapot Butterfly</li>
-        <li class="checklist-item" id="item-7">⚪ Saucer Butterfly</li>
-        <li class="checklist-item" id="item-8">⚪ Wall Star</li>
-        <li class="checklist-item" id="item-9">⚪ Tiny Candle</li>
+    <ul id="list">
+        <li class="item" id="i0">⚪ Silver Heart</li>
+        <li class="item" id="i1">⚪ Gold Star</li>
+        <li class="item" id="i2">⚪ Blue Butterfly</li>
+        <li class="item" id="i3">⚪ Sleeping Cat</li>
+        <li class="item" id="i4">⚪ Magnifying Glass</li>
+        <li class="item" id="i5">⚪ White Envelope</li>
+        <li class="item" id="i6">⚪ Teapot Butterfly</li>
+        <li class="item" id="i7">⚪ Saucer Butterfly</li>
+        <li class="item" id="i8">⚪ Wall Star</li>
+        <li class="item" id="i9">⚪ Tiny Candle</li>
     </ul>
 
     <div id="overlay">
-        <h2 id="result-title" style="color:var(--accent-gold); font-size: 2rem;"></h2>
-        <p id="result-msg" style="font-size: 1.2rem; margin-bottom: 20px;"></p>
+        <h1 id="res-title"></h1>
+        <p id="res-body"></p>
         <button onclick="location.reload()">TRY AGAIN</button>
     </div>
 
     <script>
-        let foundCount = 0;
-        let timeLeft = 60;
-        let timerId;
+        let score = 0;
+        let time = 60;
+        let clock;
 
-        function startGame() {
-            const name = document.getElementById('guestName').value;
-            if(!name) { alert("Please enter your name, guest!"); return; }
-            document.getElementById('display-name').innerText = name;
-            document.getElementById('setup-screen').style.display = 'none';
-            document.getElementById('game-header').style.display = 'flex';
-            document.getElementById('game-container').style.display = 'block';
-            document.getElementById('checklist').style.display = 'block';
-            timerId = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer').innerText = timeLeft;
-                if(timeLeft <= 0) endGame(false);
+        function play() {
+            const n = document.getElementById('playerName').value;
+            if(!n) return alert("Please enter a name!");
+            document.getElementById('p-name').innerText = n;
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('ui').style.display = 'flex';
+            document.getElementById('game-area').style.display = 'block';
+            document.getElementById('list').style.display = 'block';
+            
+            clock = setInterval(() => {
+                time--;
+                document.getElementById('timer').innerText = time;
+                if(time <= 0) end(false);
             }, 1000);
         }
 
-        function find(index, el) {
-            const item = document.getElementById('item-' + index);
-            if(item.classList.contains('found')) return;
-            item.classList.add('found');
-            item.innerText = item.innerText.replace('⚪', '✅');
-            el.style.background = "rgba(197, 160, 89, 0.5)";
+        function found(idx, el) {
+            const li = document.getElementById('i' + idx);
+            if(li.classList.contains('found')) return;
+            
+            li.classList.add('found');
+            li.innerText = li.innerText.replace('⚪', '✅');
             el.style.border = "2px solid gold";
-            foundCount++;
-            document.getElementById('counter').innerText = foundCount;
-            if(foundCount === 10) endGame(true);
+            el.style.background = "rgba(197, 160, 89, 0.3)";
+            
+            score++;
+            document.getElementById('count').innerText = score;
+            if(score === 10) end(true);
         }
 
-        function endGame(win) {
-            clearInterval(timerId);
+        function end(win) {
+            clearInterval(clock);
             document.getElementById('overlay').style.display = 'flex';
+            const title = document.getElementById('res-title');
+            const body = document.getElementById('res-body');
+            
             if(win) {
-                document.getElementById('result-title').innerText = "VICTORY!";
-                document.getElementById('result-msg').innerText = "You found all 10 items with " + timeLeft + "s left!";
+                title.innerText = "WELL DONE!";
+                title.style.color = "#c5a059";
+                body.innerText = "You found everything with " + time + "s left!";
             } else {
-                document.getElementById('result-title').innerText = "TIME'S UP!";
-                document.getElementById('result-msg').innerText = "You found " + foundCount + " objects. The library remains a mystery!";
+                title.innerText = "TIME IS UP!";
+                title.style.color = "red";
+                body.innerText = "You only found " + score + " items.";
             }
         }
     </script>
